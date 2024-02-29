@@ -6,23 +6,23 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 17:19:47 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/02/19 17:21:18 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/02/29 17:21:59 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	get_path(char *command, char *command_path)
+char	*get_path(char *command)
 {
 	int		fd[2];
 	char	*args[3];
 	pid_t	pid;
-	char	buf[256];
+	char	*buf;
 
 	args[0] = "which";
 	args[1] = command;
 	args[2] = NULL;
-
+	buf = malloc(256);
 	pipe(fd);
 	pid = fork();
 	if (pid == -1)
@@ -32,12 +32,16 @@ int	get_path(char *command, char *command_path)
 	}
 	else if (pid == 0)
 	{
-		dup2(fd[1], 1);
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
 		execve("/bin/which", args, NULL);
 	}
 	else
-		read(fd[0], command_path, 255);
-	return (0);
+	{
+		wait(NULL);
+		read(fd[0], buf, 255);
+	}
+	return (buf);
 }
 
 void	rm_newline(char *command_path)

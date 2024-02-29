@@ -1,29 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/07 16:08:08 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/02/29 17:01:16 by rgnanaso         ###   ########.fr       */
+/*   Created: 2024/02/29 14:46:30 by rgnanaso          #+#    #+#             */
+/*   Updated: 2024/02/29 17:28:28 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#include "pipex.h"
 
-# include <fcntl.h>
-# include <unistd.h>
-# include <sys/types.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/wait.h>
+int	main(int argc, char *argv[], char *envp[])
+{
+	char	*path;
 
-char	*get_path(char *command);
-void	rm_newline(char *command_path);
-
-size_t	ft_strlen(const char *s);
-char	**ft_split(char const *s, char c);
-#endif
+	path = get_path("grep");
+	printf("%s", path);
+}
