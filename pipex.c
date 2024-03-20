@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 13:31:57 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/20 15:58:13 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:36:58 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,5 @@ int	main(int argc, char *argv[], char *envp[])
 
 	pipex = init_pipex(argc, argv);
 	parsing(pipex, argc, argv, envp);
-	//pipe(pipex->pip);
-	execute(pipex, argv, argc);
-
+	execute(pipex, argv, envp, argc);
 }

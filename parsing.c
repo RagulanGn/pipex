@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 14:35:23 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/20 14:06:20 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:58:32 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,21 +52,28 @@ t_pipex	*init_pipex(int argc, char *argv[])
 t_pipex	*parsing(t_pipex *pipex, int argc, char *argv[], char *envp[])
 {
 	int		i;
+	int		j;
 
+	j = 0;
 	i = 1;
-	while (++i < argc - 1)
-		pipex->command[i - 2] = ft_split(argv[i], ' ');
+	if (ft_strncmp(argv[1], "here_doc"))
+		j++;
+	while (++i < argc - 1 - j)
+		pipex->command[i - 2] = ft_split(argv[i + j], ' ');
 	pipex->command[i - 2] = NULL;
 	i = -1;
 	while (pipex->command[++i])
 		pipex->command_path[i] = get_path(envp, pipex->command[i][0]);
 	pipex->command_path[i] = NULL;
-	pipex->file[0] = open(argv[1], O_RDONLY);
+	if (ft_strncmp(argv[1], "here_doc"))
+		pipex->file = open(argv[1], O_APPEND);
+	else
+		pipex->file[0] = open(argv[1], O_RDONLY);
 	pipex->file[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (pipex->file[0] < 0 || pipex->file[1] < 0)
 	{
 		free_pipex(pipex);
-		return(NULL);
+		return (NULL);
 	}
 	return (pipex);
 }

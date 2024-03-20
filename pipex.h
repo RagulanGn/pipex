@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 16:08:08 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/20 14:22:09 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:21:16 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ size_t	ft_strlen(const char *s);
 char	**ft_clear(char **str_arr);
 char	**ft_split(char const *s, char c);
 
-int	execute(t_pipex *pipex, char *argv[], int argc);
+int	execute(t_pipex *pipex, char *argv[], char *envp[], int argc);
 int	exec_last(t_pipex *pipex, char *argv[], int argc);
 int	exec_first(t_pipex *pipex);
 
