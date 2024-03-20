@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 12:34:35 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/02/29 15:27:52 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/03/19 14:38:04 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,18 +38,21 @@ static int	ft_count_str(char const *s, char c)
 	return (count);
 }
 
-static char	**ft_clear(char **str_arr, int i)
+char	**ft_clear(char **str_arr)
 {
-	while (i > 0)
+	int	i;
+
+	i = 0;
+	while (str_arr[i])
 	{
 		free(str_arr[i]);
-		i--;
+		i++;
 	}
 	free(str_arr);
 	return (NULL);
 }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+static size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
 	size_t	i;
 
@@ -86,7 +89,7 @@ char	**ft_split(char const *s, char c)
 			count++;
 		str_arr[i] = malloc(count + 1);
 		if (str_arr[i] == NULL)
-			return (ft_clear(str_arr, i));
+			return (ft_clear(str_arr));
 		ft_strlcpy(str_arr[i++], s - count, count + 1);
 	}
 	str_arr[i] = NULL;
