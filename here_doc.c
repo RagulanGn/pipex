@@ -1,25 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/07 17:41:13 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/04/16 14:46:28 by rgnanaso         ###   ########.fr       */
+/*   Created: 2024/04/16 17:40:10 by rgnanaso          #+#    #+#             */
+/*   Updated: 2024/04/23 15:35:28 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+int	here_doc(char *argv[])
 {
-	size_t	i;
+	char	*line;
+	int		fd;
 
-	i = 0;
-	if (n == 0)
-		return (0);
-	while ((unsigned char) s1[i] == (unsigned char) s2[i] && i < n - 1 && s1[i])
-		i++;
-	return ((unsigned char) s1[i] - (unsigned char) s2[i]);
+	line = get_next_line(0);
+	fd = open("here_docu", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	while (1)
+	{
+		if (!ft_strncmp(line, argv[2], ft_strlen(argv[2])))
+			break ;
+		write(fd, line, ft_strlen(line));
+		line = get_next_line(0);
+	}
+	close(fd);
+	return (0);
 }

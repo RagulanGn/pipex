@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 17:19:47 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/19 15:20:24 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:14:34 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ char	*get_path(char *envp[], char *cmd)
 {
 	char	**tab_path;
 	char	*cmd_path;
+	char	*cmd_path2;
 	int		i;
 
 	i = 0;
@@ -25,14 +26,16 @@ char	*get_path(char *envp[], char *cmd)
 	i = -1;
 	while (tab_path[++i])
 	{
-		cmd_path = ft_strjoin(ft_strjoin(tab_path[i], "/"), cmd);
+		cmd_path2 = ft_strjoin(tab_path[i], "/");
+		cmd_path = ft_strjoin(cmd_path2, cmd);
+		free(cmd_path2);
 		if (!access(cmd_path, F_OK))
 		{
 			ft_clear(tab_path);
 			return (cmd_path);
 		}
+		free(cmd_path);
 	}
 	ft_clear(tab_path);
-	free(cmd_path);
 	return (NULL); //Exit with correct error
 }

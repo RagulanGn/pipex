@@ -1,25 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   exit_free.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/07 17:41:13 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/04/16 14:46:28 by rgnanaso         ###   ########.fr       */
+/*   Created: 2024/04/16 15:38:54 by rgnanaso          #+#    #+#             */
+/*   Updated: 2024/04/16 15:42:04 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
-
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	if (n == 0)
-		return (0);
-	while ((unsigned char) s1[i] == (unsigned char) s2[i] && i < n - 1 && s1[i])
-		i++;
-	return ((unsigned char) s1[i] - (unsigned char) s2[i]);
-}

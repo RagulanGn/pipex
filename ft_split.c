@@ -6,21 +6,11 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 12:34:35 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/19 14:38:04 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:52:56 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
 
 static int	ft_count_str(char const *s, char c)
 {
