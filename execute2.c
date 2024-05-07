@@ -5,76 +5,82 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/19 15:16:44 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/03/20 15:32:30 by rgnanaso         ###   ########.fr       */
+/*   Created: 2024/04/30 16:45:45 by rgnanaso          #+#    #+#             */
+/*   Updated: 2024/04/30 16:57:45 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	exec_first(t_pipex *pipex)
+void	execute_first(t_pipex *pipex, char *envp[], char *argv[])
 {
-	pid_t	pid;
+	char	*command_path;
+	char	**command_tab;
+	int		fd[2];
 
-	pid = fork();
-	if (pid < 0)
-		return (0);
-	else if (pid == 0)
+	command_tab = ft_split(argv[i + 2 + pipex->here_doc], ' ');
+	command_path = get_path(envp, command_tab[0]);
+	pipe(fd);
+	pipex->pid = fork();
+	if (pipex->pid < 0)
+		exit(0);
+	else if (pipex->pid == 0)
 	{
-		dup2(pipex->file[0], STDIN_FILENO);
-		dup2(pipex->pip[1], STDOUT_FILENO);
-		close(pipex->pip[0]);
-		if (execve(pipex->command_path[0], pipex->command[0], NULL) == -1)
-			printf("failed 1");
+		close(fd[0]);
+		if (access(argv[1], R_OK))
+		{
+			perror(NULL);
+			exit(0);
+		}
+		pipex->file[0] = open(argv[1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		dup2(pipex->file[0], STDOUT_FILENO);
+		if (command_path == NULL)
+		{
+			if (argv[1][0] == '/')
+				perror(NULL);
+			else
+				write(STDERR_FILENO, "Command not found", 18);
+			exit(127);
+		}
+		if (execve(command_path, command_tab, envp) == -1) //here
+		{
+			free_pipex(pipex);
+			exit(EXIT_FAILURE);
+		}
 	}
-	return (1);
+	else
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+	}
 }
 
-//Inverser stdin et stdout
-
-int	execute(t_pipex *pipex, char *argv[], int argc)
+void	execute_last(t_pipex *pipex, char *envp[], char *argv[])
 {
-	int		i;
-	int		fd;
-	pid_t	pid;
+	close(pipex->file[0]);
 
-	i = 0;
-	exec_first(pipex);
-	while (++i < argc - 4)
+	if (access(argv[argc - 1], W_OK))
 	{
-		pid = fork();
-		if (pid < 0)
-			return (0);
-		else if (pid == 0)
-		{
-			dup2(pipex->pip[0], STDIN_FILENO);
-			dup2(pipex->file[1], STDOUT_FILENO);
-			close(pipex->pip[1]);
-			execve(pipex->command_path[i], pipex->command[i], NULL);
-		}
+		perror(NULL);
+		exit(0);
+	}
+	pipex->file[1] =  open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	dup2(pipex->file[1], STDOUT_FILENO);
+	command_tab = ft_split(argv[argc - 2], ' ');
+	command_path = get_path(envp, command_tab[0]);
+	if (command_path == NULL)
+	{
+		if (argv[argc - 2][0] == '/')
+			perror(NULL);
 		else
-		{
-			fd = dup(pipex->file[1]);
-			dup2(fd, pipex->pip[1]);
-		}
+			write(STDERR_FILENO, "Command not found", 18);
+		exit(127);
 	}
-	exec_last(pipex, argv, argc);
-	return (0);
-}
-
-int	exec_last(t_pipex *pipex, char *argv[], int argc)
-{
-	pid_t	pid;
-
-	if (pid < 0)
-		return (0);
-	else if (pid == 0)
+	if (execve(command_path, command_tab, envp) == -1)
 	{
-		close(pipex->pip[1]);
-		dup2(pipex->pip[0], STDIN_FILENO);
-		dup2(pipex->file[1], STDOUT_FILENO);
-		if (execve(pipex->command_path[argc - 4], pipex->command[argc - 4], NULL) == -1)
-			printf("failed2");
+		free_pipex(pipex);
+		exit(EXIT_FAILURE);
 	}
-	return (1);
+	free_pipex(pipex);
+	exit(0);
 }

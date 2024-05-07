@@ -3,7 +3,7 @@ NAME = pipex
 CC = cc
 CFLAGS = -Wall -Werror -Wextra -g
 
-SRC = execute.c ft_split.c ft_strjoin.c ft_strncmp.c get_path.c parsing.c main.c here_doc.c get_next_line.c get_next_line_utils.c
+SRC = execute.c ft_split.c ft_strjoin.c ft_strncmp.c get_path.c parsing.c pipex.c here_doc.c get_next_line.c get_next_line_utils.c
 
 OBJ_DIR = obj
 

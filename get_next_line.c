@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 19:08:40 by marvin            #+#    #+#             */
-/*   Updated: 2024/04/23 14:27:42 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:44:31 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,5 @@ t_list	*ft_read(int fd, t_list *lst, t_list *start, char *buf)
 		lst = lst->next;
 	}
 	buf = ft_strcut(buf);
-
 	return (lst);
 }
