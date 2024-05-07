@@ -12,37 +12,54 @@
 
 #include "pipex.h"
 
+void	error_gest(int exit_code) // char *msg
+{
+	perror(NULL);
+	// write(STDERR_FILENO, msg, ft_strlen(msg));
+	exit(exit_code);
+}
+
 void	check_infile_outfile(t_pipex *pipex, char *argv[], int i)
 {
 	if (i == 0)
 	{
 		if (access(argv[1], R_OK))
-		{
-			perror(NULL);
-			exit(0);
-		}
+			error_gest(0);
 		pipex->file[0] = open(argv[1], O_RDONLY);
 		if (pipex->file[0] < 0)
-		{
-			perror(NULL);
-			exit(0);
-		}
+			error_gest(0);
 		dup2(pipex->file[0], STDIN_FILENO);
 	}
 	else if (i == pipex->argc - 4) //change
 	{
 		if (!access(argv[pipex->argc - 1], F_OK) && access(argv[pipex->argc - 1], W_OK))
-		{
-			perror(NULL);
-			exit(0);
-		}
+			error_gest(0);
 		if (pipex->file[1] < 0)
-		{
-			perror(NULL);
-			exit(0);
-		}
+			error_gest(0);
 		dup2(pipex->file[1], STDOUT_FILENO);
 	}
+}
+
+void	execute(t_pipex *pipex, char *envp[], char *argv[], int i)
+{
+	char	*command_path;
+	char	**command_tab;
+
+	command_tab = ft_split(argv[i + 2], ' '); //Leak move into child reduce leak
+	command_path = get_path(envp, command_tab[0]); // Leak
+	if (command_path == NULL)
+		{
+			if (argv[i + 2][0] == '/')
+				perror(NULL);
+			else
+				write(STDERR_FILENO, "Command not found\n", 19);
+			exit(127);
+		}
+		if (execve(command_path, command_tab, envp) == -1) //here
+		{
+			free_pipex(pipex);
+			exit(EXIT_FAILURE);
+		}
 }
 
 void	executer(t_pipex *pipex, char *envp[], char *argv[], int i)
@@ -57,24 +74,10 @@ void	executer(t_pipex *pipex, char *envp[], char *argv[], int i)
 		exit(0);
 	else if (pipex->pid == 0)
 	{
-		command_tab = ft_split(argv[i + 2], ' '); //Leak move into child reduce leak
-		command_path = get_path(envp, command_tab[0]); // Leak
 		close(fd[0]);
 		dup2(fd[1], STDOUT_FILENO);
 		check_infile_outfile(pipex, argv, i);
-		if (command_path == NULL)
-		{
-			if (argv[i + 2][0] == '/')
-				perror(NULL);
-			else
-				write(STDERR_FILENO, "Command not found\n", 19);
-			exit(127);
-		}
-		if (execve(command_path, command_tab, envp) == -1) //here
-		{
-			free_pipex(pipex);
-			exit(EXIT_FAILURE);
-		}
+		execute(pipex, envp, argv, i);
 	}
 	else
 	{
@@ -88,7 +91,7 @@ int	main(int argc, char *argv[], char *envp[])
 	t_pipex	*pipex;
 	int		i;
 
-	if (argc < 5)
+	if (argc != 5)
 		return (0);
 	pipex = init_pipex(argv, argc);
 	i = -1;
