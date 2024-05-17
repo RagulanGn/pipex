@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/08 12:34:35 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/04/23 14:52:56 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/05/17 17:38:22 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ char	**ft_clear(char **str_arr)
 	int	i;
 
 	i = 0;
+	if (!str_arr)
+		return (NULL);
 	while (str_arr[i])
 	{
 		free(str_arr[i]);
@@ -68,7 +70,7 @@ char	**ft_split(char const *s, char c)
 	if (str_arr == NULL)
 		return (NULL);
 	i = 0;
-	while (*s)
+	while (s && *s)
 	{
 		count = 0;
 		while (*s && *s == c)

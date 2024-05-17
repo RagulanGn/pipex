@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 13:31:57 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/05/13 13:22:37 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/05/17 18:08:50 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 void	error_gest(int exit_code, t_pipex *pipex) // char *msg
 {
 	perror(NULL);
-	// write(STDERR_FILENO, msg, ft_strlen(msg));
+	//if (msg != NULL)
+	//	write(STDERR_FILENO, msg, ft_strlen(msg));
 	free_pipex(pipex);
 	exit(exit_code);
 }
@@ -38,6 +39,8 @@ void	check_infile_outfile(t_pipex *pipex, char *argv[], int i)
 			error_gest(1, pipex);
 		dup2(pipex->file[1], STDOUT_FILENO);
 	}
+	close(pipex->file[0]);
+	close(pipex->file[1]);
 }
 
 void	executeyes(t_pipex *pipex, char *envp[], char *argv[], int i)
@@ -49,11 +52,25 @@ void	executeyes(t_pipex *pipex, char *envp[], char *argv[], int i)
 	command_path = get_path(envp, command_tab[0]); // Leak
 	if (command_path == NULL)
 	{
+		free_pipex(pipex);
+		if (command_tab[0] && !access(command_tab[0], F_OK) && access(command_tab[0], X_OK))
+		{
+			ft_clear(command_tab);
+			command_tab = NULL;
+			perror(NULL);
+			exit(126);
+		}
 		if (argv[i + 2][0] == '/')
 			perror(NULL);
 		else
-			write(STDERR_FILENO, "Command not found\n", 19);
-		free_pipex(pipex);
+		{
+			write(STDERR_FILENO, "Command not found:", 18);
+			if (command_tab[0])
+				write(STDERR_FILENO, command_tab[0], ft_strlen(command_tab[0]));
+			write(STDERR_FILENO, "\n", 1);
+		}
+		ft_clear(command_tab);
+		command_tab = NULL;
 		exit(127);
 	}
 	if (execve(command_path, command_tab, envp) == -1) //here
@@ -75,6 +92,7 @@ void	executer(t_pipex *pipex, char *envp[], char *argv[], int i)
 	{
 		close(pip[0]);
 		dup2(pip[1], STDOUT_FILENO);
+		close(pip[1]);
 		check_infile_outfile(pipex, argv, i);
 		executeyes(pipex, envp, argv, i);
 	}
@@ -82,6 +100,7 @@ void	executer(t_pipex *pipex, char *envp[], char *argv[], int i)
 	{
 		close(pip[1]);
 		dup2(pip[0], STDIN_FILENO);
+		close(pip[0]);
 	}
 }
 
@@ -91,6 +110,7 @@ int	main(int argc, char *argv[], char *envp[])
 	int		i;
 	int		status;
 	int		return_val;
+	pid_t	pid;
 
 	if (argc < 5)
 		return (0);
@@ -101,11 +121,13 @@ int	main(int argc, char *argv[], char *envp[])
 	//pipe(pipex->pip);
 	while (++i < argc - 3)
 		executer(pipex, envp, argv, i);
-	//waitpid(pipex->pid, status, WUNTRACED);
-	return_val = 0;
-	waitpid(pipex->pid, &status, 0);
-	return_val = WEXITSTATUS(status);
-	while (wait(&status) > 0);
+	pid = waitpid(-1, &status, 0);
+	while (pid > 0)
+	{
+		if (pipex->pid == pid)
+			return_val = WEXITSTATUS(status);
+		pid = waitpid(-1, &status, 0);
+	}
 	free_pipex(pipex);
 	return (return_val);
 }

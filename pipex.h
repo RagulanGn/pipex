@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 16:08:08 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/05/07 12:51:02 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/05/17 15:46:50 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,5 @@ char	**ft_split(char const *s, char c);
 
 int		here_doc(char *argv[]);
 
-int		execute(t_pipex *pipex, char *argv[], char *envp[], int argc);
 
 #endif
