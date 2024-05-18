@@ -3,20 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 13:31:57 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/05/17 18:08:50 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/05/18 10:56:06 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	error_gest(int exit_code, t_pipex *pipex) // char *msg
+void	error_gest(int exit_code, t_pipex *pipex)
 {
 	perror(NULL);
-	//if (msg != NULL)
-	//	write(STDERR_FILENO, msg, ft_strlen(msg));
 	free_pipex(pipex);
 	exit(exit_code);
 }
@@ -31,9 +29,10 @@ void	check_infile_outfile(t_pipex *pipex, char *argv[], int i)
 			error_gest(1, pipex);
 		dup2(pipex->file[0], STDIN_FILENO);
 	}
-	else if (i == pipex->argc - 4) //change
+	else if (i == pipex->argc - 4) //change for bonus
 	{
-		if (!access(argv[pipex->argc - 1], F_OK) && access(argv[pipex->argc - 1], W_OK))
+		if (!access(argv[pipex->argc - 1], F_OK) && \
+		access(argv[pipex->argc - 1], W_OK))
 			error_gest(1, pipex);
 		if (pipex->file[1] < 0)
 			error_gest(1, pipex);
@@ -43,24 +42,20 @@ void	check_infile_outfile(t_pipex *pipex, char *argv[], int i)
 	close(pipex->file[1]);
 }
 
-void	executeyes(t_pipex *pipex, char *envp[], char *argv[], int i)
+void	check_cmd_path(char *command_path, char **command_tab, t_pipex *pipex)
 {
-	char	*command_path;
-	char	**command_tab;
-
-	command_tab = ft_split(argv[i + 2], ' '); //Leak move into child reduce leak
-	command_path = get_path(envp, command_tab[0]); // Leak
 	if (command_path == NULL)
 	{
 		free_pipex(pipex);
-		if (command_tab[0] && !access(command_tab[0], F_OK) && access(command_tab[0], X_OK))
+		if (command_tab[0] && !access(command_tab[0], F_OK) && \
+		access(command_tab[0], X_OK))
 		{
 			ft_clear(command_tab);
 			command_tab = NULL;
 			perror(NULL);
 			exit(126);
 		}
-		if (argv[i + 2][0] == '/')
+		if (command_tab && command_tab[0] && command_tab[0][0] == '/')
 			perror(NULL);
 		else
 		{
@@ -73,6 +68,16 @@ void	executeyes(t_pipex *pipex, char *envp[], char *argv[], int i)
 		command_tab = NULL;
 		exit(127);
 	}
+}
+
+void	executeyes(t_pipex *pipex, char *envp[], char *argv[], int i)
+{
+	char	*command_path;
+	char	**command_tab;
+
+	command_tab = ft_split(argv[i + 2], ' '); //Leak move into child reduce leak
+	command_path = get_path(envp, command_tab[0]); // Leak
+	check_cmd_path(command_path, command_tab, pipex);
 	if (execve(command_path, command_tab, envp) == -1) //here
 	{
 		free_pipex(pipex);
@@ -112,13 +117,12 @@ int	main(int argc, char *argv[], char *envp[])
 	int		return_val;
 	pid_t	pid;
 
-	if (argc < 5)
+	if ((argc != 5 && BONUS) || argc < 5)
 		return (0);
 	pipex = init_pipex(argv, argc);
 	i = -1;
 	pipex->file[0] = open(argv[1], O_RDONLY);
-	pipex->file[1] = open(argv[pipex->argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	//pipe(pipex->pip);
+	pipex->file[1] = open(argv[pipex->argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0666); //REPLACE BY THE VALUE OR CUT THE LINE
 	while (++i < argc - 3)
 		executer(pipex, envp, argv, i);
 	pid = waitpid(-1, &status, 0);

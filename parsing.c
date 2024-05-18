@@ -6,7 +6,7 @@
 /*   By: rgnanaso <rgnanaso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 14:35:23 by rgnanaso          #+#    #+#             */
-/*   Updated: 2024/05/17 17:51:05 by rgnanaso         ###   ########.fr       */
+/*   Updated: 2024/05/17 18:42:05 by rgnanaso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,10 @@ t_pipex	*init_pipex(char *argv[], int argc)
 	i = 1;
 	pipex = malloc(sizeof(t_pipex));
 	if (pipex == NULL)
-		return (NULL); //change to exit
+	{
+		perror(NULL);
+		exit(errno); // Dont too sur about this
+	}
 	pipex->here_doc = 0;
 	if (!ft_strncmp(argv[1], "here_doc", 8))
 		pipex->here_doc = 1;
